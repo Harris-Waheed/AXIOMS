@@ -4,17 +4,21 @@ from dotenv import load_dotenv
 
 env_file = load_dotenv()
 
-USER = os.environ.get('USER')
-PASSWORD = os.environ.get('PASSWORD')
-DSN = 'localhost/XEPDB1'
+db_pool = oracledb.create_pool(
+    user = os.environ.get('DB_USER'),
+    password = os.environ.get('DB_PASSWORD'),
+    dsn = 'localhost/XEPDB1',
+    min = 2,
+    max = 11,
+    increment = 1
+)
 
 
 def get_db():
 
-    connection = None
+    connection = db_pool.acquire()
 
     try:
-        connection = oracledb.connect(user=USER, password=PASSWORD, dsn=DSN)
         print('Database Connected!')
         yield connection
 
