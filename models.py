@@ -1,6 +1,13 @@
 from pydantic import BaseModel, Field
 
 
+class OrderBase(BaseModel):
+
+    customer_name: str
+    customer_address: str
+    customer_bill: int
+
+
 class OrderIn(BaseModel):
 
     customer_name: str = Field(..., max_length=40)
@@ -13,6 +20,8 @@ class OrderIn(BaseModel):
 class OrderOut(BaseModel):
 
     customer_name: str
+    customer_number: str
+    customer_city : str
     customer_address: str
     customer_bill: int
-
+    order_date : str
