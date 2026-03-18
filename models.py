@@ -1,14 +1,6 @@
 from pydantic import BaseModel, Field
 
 
-class OrderBase(BaseModel):
-
-    customer_name: str
-    customer_address: str
-    customer_bill: int
-    product_id: int
-
-
 class OrderIn(BaseModel):
 
     customer_name: str = Field(..., max_length=40)
@@ -28,3 +20,23 @@ class OrderOut(BaseModel):
     customer_bill: int
     order_date : str
     product_id : int
+    order_id: int
+
+
+class InventoryIn(BaseModel):
+
+    product_name : str = Field(..., max_length=100)
+    product_description : str = Field(..., max_length=1000)
+    product_wholesale : int
+    product_retail : int
+    product_image : str
+
+
+class InventoryOut(BaseModel):
+
+    product_id : int
+    product_name : str
+    product_description: str
+    product_wholesale: int
+    product_retail: int
+    product_image: str
