@@ -44,7 +44,7 @@ AS BEGIN
     COMMIT ;
 END;
 
-CREATE OR REPLACE PROCEDURE p_display_order(
+CREATE OR REPLACE PROCEDURE p_display_orders(
 
     ref_cur OUT SYS_REFCURSOR
 )
@@ -55,6 +55,20 @@ AS BEGIN
             FROM ORDERS;
 
 END;
+
+CREATE OR REPLACE PROCEDURE p_display_order(
+
+    p_order_id IN VARCHAR2,
+    p_order OUT SYS_REFCURSOR
+)
+AS BEGIN
+    OPEN p_order FOR
+        SELECT CUSTOMER_NAME, CUSTOMER_NUMBER, CUSTOMER_CITY, CUSTOMER_ADDRESS, CUSTOMER_BILL,
+               TO_CHAR(ORDER_DATE, 'DD-MM_YYYY'), PRODUCT_ID, ORDER_ID
+            FROM ORDERS
+                WHERE ORDER_ID = p_order_id;
+
+end;
 
 DECLARE inventory_count NUMBER;
 
@@ -70,7 +84,8 @@ BEGIN
         product_description varchar2(1000),
         product_wholesale NUMBER NOT NULL ,
         product_retail NUMBER NOT NULL ,
-        product_image VARCHAR2(200)
+        product_image VARCHAR2(200),
+        created_at DATE DEFAULT TRUNC(SYSDATE) NOT NULL
 
                           )';
        ELSE
@@ -104,5 +119,18 @@ AS BEGIN
         SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE,
         PRODUCT_RETAIL, PRODUCT_IMAGE
         FROM INVENTORY;
+
+end;
+
+CREATE OR REPLACE PROCEDURE p_display_product(
+
+    p_product_id IN NUMBER,
+    p_product OUT SYS_REFCURSOR
+)
+AS BEGIN
+    OPEN p_product FOR
+        SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE, PRODUCT_RETAIL, PRODUCT_IMAGE
+            FROM INVENTORY
+                WHERE PRODUCT_ID = p_product_id;
 
 end;
