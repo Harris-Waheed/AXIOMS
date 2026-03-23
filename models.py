@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class OrderIn(BaseModel):
@@ -30,13 +30,12 @@ class InventoryIn(BaseModel):
     product_wholesale : int
     product_retail : int
     product_image : str
+    product_link : HttpUrl | None = None  # "HttpUrl OR None". Default is None.
 
-
-class InventoryOut(BaseModel):
+class InventoryCustomerOut(BaseModel):
 
     product_id : int
     product_name : str
     product_description: str
-    product_wholesale: int
     product_retail: int
     product_image: str

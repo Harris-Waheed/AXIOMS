@@ -38,13 +38,13 @@ def add_order(new_order: OrderIn, db= Depends(get_db)):
 
 
 @router.get('/', response_model=list[OrderOut])
-def display_order(db= Depends(get_db)):
+def display_orders(db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
             data = cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_order', [data])
+            cursor.callproc('p_display_orders', [data])
             out_cursor = data.getvalue()
             rows = out_cursor.fetchall()
 
@@ -75,3 +75,37 @@ def display_order(db= Depends(get_db)):
 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail='Failed to load orders data. Please try again later.')
+
+@router.get('/{order_id}', response_model=OrderOut) # Created to get single order data
+def display_order(order_id: int, db = Depends(get_db)):
+
+    try:
+        with db.cursor() as cursor:
+            cursor.callproc('p_display_order', [order_id])
+
+            results = cursor.getimplicitresults()
+            if results:
+                row = results[0].fetchone()
+            else:
+                row = None
+
+    except oracledb.Error as e:
+        print(f'Error Occurred: {e}')
+        raise HTTPException(status_code=500, detail='Unable to load!')
+
+    if not row:
+        raise HTTPException(status_code=404, detail='Order Not Found!')
+
+    result = {
+
+        'customer_name': row[0],
+        'customer_number': row[1],
+        'customer_city': row[2],
+        'customer_address': row[3],
+        'customer_bill': row[4],
+        'order_date': row[5],
+        'product_id': row[6],
+        'order_id': row[7]
+    }
+
+    return result
