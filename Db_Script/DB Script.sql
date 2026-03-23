@@ -56,17 +56,18 @@ AS BEGIN
 
 END;
 
-CREATE OR REPLACE PROCEDURE p_display_order(
+CREATE OR REPLACE PROCEDURE p_display_order(p_order_id IN VARCHAR2)
+    AS
+    p_order SYS_REFCURSOR;
 
-    p_order_id IN VARCHAR2,
-    p_order OUT SYS_REFCURSOR
-)
-AS BEGIN
+    BEGIN
     OPEN p_order FOR
         SELECT CUSTOMER_NAME, CUSTOMER_NUMBER, CUSTOMER_CITY, CUSTOMER_ADDRESS, CUSTOMER_BILL,
                TO_CHAR(ORDER_DATE, 'DD-MM_YYYY'), PRODUCT_ID, ORDER_ID
             FROM ORDERS
                 WHERE ORDER_ID = p_order_id;
+
+    DBMS_SQL.RETURN_RESULT(p_order);
 
 end;
 
@@ -85,7 +86,8 @@ BEGIN
         product_wholesale NUMBER NOT NULL ,
         product_retail NUMBER NOT NULL ,
         product_image VARCHAR2(200),
-        created_at DATE DEFAULT TRUNC(SYSDATE) NOT NULL
+        created_at DATE DEFAULT TRUNC(SYSDATE) NOT NULL,
+        PRODUCT_LINK VARCHAR2(500)
 
                           )';
        ELSE
@@ -99,13 +101,16 @@ CREATE OR REPLACE PROCEDURE p_add_inventory(
     p_product_description IN VARCHAR2,
     p_product_wholesale IN NUMBER,
     p_product_retail IN NUMBER,
-    p_product_image IN VARCHAR2
+    p_product_image IN VARCHAR2,
+    p_product_link IN VARCHAR2
+
 )
 AS BEGIN
 
-    INSERT INTO INVENTORY(PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE, PRODUCT_RETAIL, PRODUCT_IMAGE)
+    INSERT INTO INVENTORY(PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE, PRODUCT_RETAIL, PRODUCT_IMAGE, PRODUCT_LINK)
     VALUES(p_product_name, p_product_description,
-           p_product_wholesale, p_product_retail, p_product_image);
+           p_product_wholesale, p_product_retail, p_product_image,
+           p_product_link);
 
     COMMIT ;
 end;
@@ -122,15 +127,20 @@ AS BEGIN
 
 end;
 
-CREATE OR REPLACE PROCEDURE p_display_product(
-
-    p_product_id IN NUMBER,
-    p_product OUT SYS_REFCURSOR
-)
-AS BEGIN
+CREATE OR REPLACE PROCEDURE p_display_product(p_product_id IN NUMBER)
+    AS
+    p_product SYS_REFCURSOR;
+    BEGIN
     OPEN p_product FOR
         SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE, PRODUCT_RETAIL, PRODUCT_IMAGE
             FROM INVENTORY
                 WHERE PRODUCT_ID = p_product_id;
 
+    DBMS_SQL.RETURN_RESULT(p_product);
+
 end;
+
+ALTER TABLE INVENTORY
+ADD PRODUCT_LINK VARCHAR2(500);
+
+select * from INVENTORY;
