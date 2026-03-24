@@ -18,12 +18,14 @@ def add_inventory(new_product: InventoryIn, db= Depends(get_db)):
                                             new_product.product_wholesale,
                                             new_product.product_retail,
                                             new_product.product_image,
+                                            new_product.product_category,
                                             product_link
                                              ])
         result = {
             'product_name' : new_product.product_name,
             'product_retail' : new_product.product_retail,
             'product_image' : new_product.product_image,
+            'product_category' : new_product.product_category,
             'product_link' : new_product.product_link
         }
 
@@ -59,7 +61,8 @@ def display_inventory(db= Depends(get_db)):
                     'product_name': row[1],
                     'product_description': row[2],
                     'product_retail': row[4],
-                    'product_image': row[5]
+                    'product_image': row[5],
+                    'product_category' : row[7]
                 }
 
                 orders.append(result)
@@ -99,7 +102,8 @@ def display_product(item_id: int, db=Depends(get_db)):
         'product_name': row[1],
         'product_description': row[2],
         'product_retail': row[4],
-        'product_image': row[5]
+        'product_image': row[5],
+        'product_category' : row[7]
     }
 
     return result

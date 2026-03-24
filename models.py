@@ -8,10 +8,12 @@ class OrderIn(BaseModel):
     customer_city : str = Field(..., max_length=100)
     customer_address: str = Field(..., max_length=200)
     customer_bill : int = Field(..., gt=0)
-    product_id : int = Field(...)
+    product_quantity : int = Field(..., gt=0)
+    product_id : int
 
 
-class OrderOut(BaseModel):
+
+class OrderCustomerOut(BaseModel):
 
     customer_name: str
     customer_number: str
@@ -19,8 +21,12 @@ class OrderOut(BaseModel):
     customer_address: str
     customer_bill: int
     order_date : str
-    product_id : int
     order_id: int
+    product_quantity : int
+
+
+class OrderAdminOut(OrderCustomerOut):
+    product_id : int
 
 
 class InventoryIn(BaseModel):
@@ -30,6 +36,7 @@ class InventoryIn(BaseModel):
     product_wholesale : int
     product_retail : int
     product_image : str
+    product_category : str
     product_link : HttpUrl | None = None  # "HttpUrl OR None". Default is None.
 
 class InventoryCustomerOut(BaseModel):
@@ -39,3 +46,4 @@ class InventoryCustomerOut(BaseModel):
     product_description: str
     product_retail: int
     product_image: str
+    product_category : str
