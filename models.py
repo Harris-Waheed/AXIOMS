@@ -1,5 +1,10 @@
 from pydantic import BaseModel, Field, HttpUrl
+from typing import List
 
+class CartItems(BaseModel):
+
+    product_id : int
+    quantity : int
 
 class OrderIn(BaseModel):
 
@@ -8,10 +13,7 @@ class OrderIn(BaseModel):
     customer_city : str = Field(..., max_length=100)
     customer_address: str = Field(..., max_length=200)
     customer_bill : int = Field(..., gt=0)
-    product_quantity : int = Field(..., gt=0)
-    product_id : int
-
-
+    cart_items : List[CartItems]
 
 class OrderCustomerOut(BaseModel):
 
@@ -22,11 +24,6 @@ class OrderCustomerOut(BaseModel):
     customer_bill: int
     order_date : str
     order_id: int
-    product_quantity : int
-
-
-class OrderAdminOut(OrderCustomerOut):
-    product_id : int
 
 
 class InventoryIn(BaseModel):
