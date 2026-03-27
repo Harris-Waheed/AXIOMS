@@ -71,3 +71,13 @@ CREATE OR REPLACE PROCEDURE p_display_product(p_product_id IN NUMBER)
 
 end;
 
+CREATE OR REPLACE PROCEDURE p_verify_product(p_product_id IN NUMBER)
+AS
+    result_cur SYS_REFCURSOR;
+BEGIN
+    OPEN result_cur FOR
+        SELECT PRODUCT_ID FROM INVENTORY
+            WHERE PRODUCT_ID = p_product_id;
+
+   DBMS_SQL.RETURN_RESULT(result_cur);
+end;
