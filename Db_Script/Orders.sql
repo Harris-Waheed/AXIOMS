@@ -15,11 +15,8 @@ BEGIN
         customer_city VARCHAR2(100) NOT NULL ,
         customer_address VARCHAR2(200) NOT NULL ,
         customer_bill NUMBER NOT NULL ,
-        order_date DATE DEFAULT TRUNC(SYSDATE),
-        quantity NUMBER NOT NULL ,
-        product_id NUMBER NOT NULL ,
-        FOREIGN KEY (product_id) REFERENCES INVENTORY(product_id)
-    )';
+        order_date DATE DEFAULT TRUNC(SYSDATE)
+        )';
     ELSE
         DBMS_OUTPUT.PUT_LINE('TABLE ORDERS ALREADY EXISTS!');
 
@@ -33,16 +30,13 @@ CREATE OR REPLACE PROCEDURE p_add_order(
     p_city IN VARCHAR2,
     p_address IN VARCHAR2,
     p_bill IN NUMBER,
-    p_product_id IN NUMBER,
-    p_quantity IN NUMBER,
     p_order_id OUT NUMBER
 )
 AS BEGIN
-    INSERT INTO ORDERS(customer_name, customer_number, customer_city, customer_address, customer_bill,
-                       quantity, PRODUCT_ID)
+    INSERT INTO ORDERS(customer_name, customer_number, customer_city, customer_address, customer_bill)
     VALUES (p_name, p_number,
-            p_city, p_address, p_bill,
-            p_quantity, p_product_id)
+            p_city, p_address, p_bill
+            )
             RETURNING ORDER_ID INTO p_order_id;
 
     COMMIT ;
@@ -55,7 +49,7 @@ CREATE OR REPLACE PROCEDURE p_display_orders(
 AS BEGIN
     OPEN ref_cur FOR
         SELECT CUSTOMER_NAME, CUSTOMER_NUMBER, CUSTOMER_CITY, CUSTOMER_ADDRESS, CUSTOMER_BILL,
-               TO_CHAR(ORDER_DATE, 'DD-MM_YYYY'), PRODUCT_ID, ORDER_ID, QUANTITY
+               TO_CHAR(ORDER_DATE, 'DD-MM_YYYY'), ORDER_ID
             FROM ORDERS;
 
 END;
@@ -67,7 +61,7 @@ CREATE OR REPLACE PROCEDURE p_display_order(p_order_id IN VARCHAR2)
     BEGIN
     OPEN p_order FOR
         SELECT CUSTOMER_NAME, CUSTOMER_NUMBER, CUSTOMER_CITY, CUSTOMER_ADDRESS, CUSTOMER_BILL,
-               TO_CHAR(ORDER_DATE, 'DD-MM_YYYY'), PRODUCT_ID, ORDER_ID, QUANTITY
+               TO_CHAR(ORDER_DATE, 'DD-MM_YYYY'), ORDER_ID
             FROM ORDERS
                 WHERE ORDER_ID = p_order_id;
 
@@ -75,15 +69,24 @@ CREATE OR REPLACE PROCEDURE p_display_order(p_order_id IN VARCHAR2)
 
 end;
 
-SELECT * FROM ORDERS;
-
-CREATE OR REPLACE PROCEDURE p_verify_product(p_product_id IN NUMBER)
+CREATE OR REPLACE PROCEDURE p_verify_order(p_order_id IN NUMBER)
 AS
     result_cur SYS_REFCURSOR;
 BEGIN
     OPEN result_cur FOR
-        SELECT PRODUCT_ID FROM INVENTORY
-            WHERE PRODUCT_ID = p_product_id;
+        SELECT ORDER_ID FROM ORDERS
+            WHERE ORDER_ID = p_order_id;
 
-   DBMS_SQL.RETURN_RESULT(result_cur);
+    DBMS_SQL.RETURN_RESULT(result_cur);
+
 end;
+
+
+CREATE OR REPLACE PROCEDURE p_delete_order(p_order_id IN NUMBER)
+AS
+    BEGIN
+        DELETE FROM ORDERS
+               WHERE ORDER_ID = p_order_id;
+
+        COMMIT ;
+    end;
