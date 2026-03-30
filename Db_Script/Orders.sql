@@ -15,6 +15,7 @@ BEGIN
         customer_city VARCHAR2(100) NOT NULL ,
         customer_address VARCHAR2(200) NOT NULL ,
         customer_bill NUMBER NOT NULL ,
+        status VARCHAR2(40) DEFAULT ''PENDING'' NOT NULL ,
         order_date DATE DEFAULT TRUNC(SYSDATE)
         )';
     ELSE
@@ -90,3 +91,13 @@ AS
 
         COMMIT ;
     end;
+
+CREATE OR REPLACE PROCEDURE p_update_order_status(p_order_id IN NUMBER, new_status IN VARCHAR2)
+AS
+BEGIN
+    update ORDERS
+    set STATUS = new_status
+    WHERE ORDER_ID = p_order_id;
+
+    COMMIT ;
+END;

@@ -15,6 +15,7 @@ BEGIN
         product_image VARCHAR2(200),
         category VARCHAR2(200) NOT NULL,
         PRODUCT_LINK VARCHAR2(500),
+        status VARCHAR2(40) DEFAULT ''ACTIVE'' NOT NULL ,
         created_at DATE DEFAULT TRUNC(SYSDATE) NOT NULL
 
                           )';
@@ -52,7 +53,7 @@ CREATE OR REPLACE PROCEDURE p_display_inventory(
 AS BEGIN
     OPEN ref_cur FOR
         SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE,
-        PRODUCT_RETAIL, PRODUCT_IMAGE, PRODUCT_LINK, CATEGORY
+        PRODUCT_RETAIL, PRODUCT_IMAGE, PRODUCT_LINK, CATEGORY, STATUS
         FROM INVENTORY;
 
 end;
@@ -63,7 +64,7 @@ CREATE OR REPLACE PROCEDURE p_display_product(p_product_id IN NUMBER)
     BEGIN
     OPEN p_product FOR
         SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE, PRODUCT_RETAIL, PRODUCT_IMAGE,
-               PRODUCT_LINK, CATEGORY
+               PRODUCT_LINK, CATEGORY, STATUS
             FROM INVENTORY
                 WHERE PRODUCT_ID = p_product_id;
 
@@ -81,3 +82,25 @@ BEGIN
 
    DBMS_SQL.RETURN_RESULT(result_cur);
 end;
+
+CREATE OR REPLACE PROCEDURE p_delete_product(p_product_id IN NUMBER)
+AS
+    BEGIN
+        DELETE FROM INVENTORY
+               WHERE PRODUCT_ID = p_product_id;
+
+        COMMIT ;
+    end;
+
+CREATE OR REPLACE PROCEDURE p_update_product_status(p_product_id IN NUMBER, new_status IN VARCHAR2)
+AS
+BEGIN
+    update INVENTORY
+    set STATUS = new_status
+    WHERE PRODUCT_ID = p_product_id;
+
+    COMMIT ;
+END;
+
+select * from INVENTORY;
+
