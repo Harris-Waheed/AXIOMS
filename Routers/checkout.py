@@ -1,6 +1,6 @@
 import oracledb
 from fastapi import APIRouter, Depends, HTTPException, status
-from models import OrderIn, OrderCustomerOut
+from models import OrderIn, OrderCustomerOut, OrderStatus
 from database import get_db
 
 
@@ -153,3 +153,24 @@ def delete_order(order_id : int, db = Depends(get_db)):
    except oracledb.Error as e:
        print('Database Error', e)
        raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
+
+@router.put('/{order_id}')
+def update_order_status(order_id : int, new_status : OrderStatus, db = Depends(get_db)):
+
+    try:
+        with db.cursor() as cursor:
+            cursor.callproc('p_verify_order', [order_id])
+            feedback = cursor.getimplicitresults()
+            actual_fb = feedback[0].fetchone() if feedback else None
+
+            if actual_fb:
+
+                cursor.callproc('p_update_order_status', [order_id, new_status])
+                return {'status': new_status}
+
+            else:
+                raise HTTPException(status_code=404, detail=f'Order {order_id} Not Exists!')
+
+    except oracledb.Error as e:
+        print('Error For Updating Status', e)
+        raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')

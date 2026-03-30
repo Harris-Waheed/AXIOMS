@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, HttpUrl
 from typing import List
+from enum import Enum
 
 class CartItems(BaseModel):
 
@@ -25,7 +26,6 @@ class OrderCustomerOut(BaseModel):
     order_date : str
     order_id: int
 
-
 class InventoryIn(BaseModel):
 
     product_name : str = Field(..., max_length=100)
@@ -44,3 +44,23 @@ class InventoryCustomerOut(BaseModel):
     product_retail: int
     product_image: str
     product_category : str
+
+class InventoryAdminOut(InventoryCustomerOut):
+
+    product_wholesale : int
+    product_link : HttpUrl
+    product_status : str
+
+
+class ProductStatus(str, Enum):
+
+    ACTIVE = 'Active'
+    INACTIVE = 'Inactive'
+
+class OrderStatus(str, Enum):
+
+    PENDING = 'Pending'
+    CANCEL = 'Cancel'
+    CONFIRM = 'Confirm'
+    SHIPPED = 'Shipped'
+    DELIVERED = 'Delivered'
