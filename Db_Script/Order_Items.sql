@@ -29,5 +29,4 @@ BEGIN
 
     COMMIT ;
 END;
-
-select PRODUCT_ID from INVENTORY;
+    
