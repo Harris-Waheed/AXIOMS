@@ -18,6 +18,8 @@ BEGIN
     END IF;
 END;
 
+
+
 CREATE OR REPLACE PROCEDURE p_add_order_item(
     p_order_id IN NUMBER,
     p_product_id IN NUMBER,
@@ -29,4 +31,6 @@ BEGIN
 
     COMMIT ;
 END;
-    
+
+
+truncate table ORDER_ITEMS;
