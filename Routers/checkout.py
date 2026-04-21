@@ -1,6 +1,6 @@
 import oracledb
 from fastapi import APIRouter, Depends, HTTPException, status
-from models import OrderIn, OrderCustomerOut, OrderStatus
+from models import OrderIn, OrderCustomerOut, OrderAdminOut, OrderStatus
 from database import get_db
 
 
@@ -82,6 +82,48 @@ def display_orders(db= Depends(get_db)):
                     'customer_bill': row[4],
                     'order_date': row[5],
                     'order_id' : row[6],
+                }
+
+                orders.append(result)
+
+        return orders
+
+    except oracledb.Error as e:
+        print(f'Error for fetching checkout data {e}')
+
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail='Failed to load orders data. Please try again later.')
+
+
+@router.get('/admin', response_model=list[OrderAdminOut])
+def display_orders_admin(db= Depends(get_db)):
+
+    try:
+        with db.cursor() as cursor:
+            data = cursor.var(oracledb.CURSOR)
+
+            cursor.callproc('p_display_orders_admin', [data])
+            out_cursor = data.getvalue()
+            rows = out_cursor.fetchall()
+
+            out_cursor.close()
+
+            orders = []
+
+            for row in rows:
+                result = {
+
+                    'customer_name': row[0],
+                    'customer_number': row[1],
+                    'customer_city': row[2],
+                    'customer_address': row[3],
+                    'customer_bill': row[4],
+                    'order_date': row[5],
+                    'order_id': row[6],
+                    'product_name' : row[7],
+                    'product_retail' : row[8],
+                    'product_link' : row[9],
+                    'product_id' : row[10]
                 }
 
                 orders.append(result)
