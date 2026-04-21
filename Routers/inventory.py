@@ -18,8 +18,8 @@ def add_inventory(new_product: InventoryIn, db= Depends(get_db)):
                                             new_product.product_wholesale,
                                             new_product.product_retail,
                                             new_product.product_image,
-                                            new_product.product_category,
-                                            product_link
+                                            product_link,
+                                            new_product.product_category
                                              ])
         result = {
             'product_name' : new_product.product_name,
@@ -45,7 +45,7 @@ def display_customer_inventory(db= Depends(get_db)):
         with db.cursor() as cursor:
             data = cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_inventory', [data])
+            cursor.callproc('p_display_inventory', [data, 'CUSTOMER'.upper()])
             out_cursor = data.getvalue()
             rows = out_cursor.fetchall()
 
@@ -65,6 +65,9 @@ def display_customer_inventory(db= Depends(get_db)):
                     'product_category' : row[7]
                 }
 
+                if row[8] and row[8] == 'Inactive':
+                    continue
+
                 orders.append(result)
 
         return orders
@@ -82,7 +85,7 @@ def display_admin_inventory(db= Depends(get_db)):
         with db.cursor() as cursor:
             data = cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_inventory', [data])
+            cursor.callproc('p_display_inventory', [data, 'ADMIN'.upper()])
             out_cursor = data.getvalue()
             rows = out_cursor.fetchall()
 
@@ -134,15 +137,18 @@ def display_product(item_id: int, db=Depends(get_db)):
         raise HTTPException(status_code=500, detail='Unable to load!')
 
     if not row:
-        raise HTTPException(status_code=404, detail='Product Not Found!')
+        raise HTTPException(status_code=404, detail='Product Not Found/Inactive!')
 
     result = {
         'product_id': row[0],
         'product_name': row[1],
         'product_description': row[2],
+        'product_wholesale': row[3],
         'product_retail': row[4],
         'product_image': row[5],
-        'product_category' : row[7]
+        'product_link': row[6],
+        'product_category': row[7],
+        'product_status': row[8]
     }
 
     return result
@@ -172,7 +178,7 @@ def delete_product(product_id : int, db = Depends(get_db)):
        print('Database Error', e)
        raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
 
-@router.put('/{product_id}')
+@router.patch('/{product_id}/status')
 def update_product_status(product_id : int, new_status : ProductStatus, db = Depends(get_db)):
 
     try:

@@ -26,6 +26,14 @@ class OrderCustomerOut(BaseModel):
     order_date : str
     order_id: int
 
+class OrderAdminOut(OrderCustomerOut):
+
+    product_id : int
+    product_name : str
+    product_retail : int
+    product_link : HttpUrl | None = None
+
+
 class InventoryIn(BaseModel):
 
     product_name : str = Field(..., max_length=100)
@@ -64,3 +72,10 @@ class OrderStatus(str, Enum):
     CONFIRM = 'Confirm'
     SHIPPED = 'Shipped'
     DELIVERED = 'Delivered'
+
+class Reviews(BaseModel):
+
+    name : str
+    stars : int
+    description : str
+
