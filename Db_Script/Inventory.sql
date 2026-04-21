@@ -7,16 +7,16 @@ BEGIN
    IF inventory_count = 0
        THEN
        EXECUTE IMMEDIATE 'CREATE TABLE INVENTORY(
-        product_id NUMBER GENERATED ALWAYS AS IDENTITY (NOCACHE) PRIMARY KEY ,
-        product_name VARCHAR2(100) NOT NULL ,
-        product_description varchar2(1000),
-        product_wholesale NUMBER NOT NULL ,
-        product_retail NUMBER NOT NULL ,
-        product_image VARCHAR2(200),
-        category VARCHAR2(200) NOT NULL,
-        PRODUCT_LINK VARCHAR2(500),
-        status VARCHAR2(40) DEFAULT ''ACTIVE'' NOT NULL ,
-        created_at DATE DEFAULT TRUNC(SYSDATE) NOT NULL
+        PRODUCT_ID NUMBER GENERATED ALWAYS AS IDENTITY (NOCACHE) PRIMARY KEY ,
+        PRODUCT_NAME VARCHAR2(100) NOT NULL ,
+        PRODUCT_DESCRIPTION VARCHAR2(1000),
+        PRODUCT_WHOLESALE NUMBER NOT NULL ,
+        PRODUCT_RETAIL NUMBER NOT NULL ,
+        PRODUCT_IMAGE VARCHAR2(3000),
+        CATEGORY VARCHAR2(200) NOT NULL,
+        PRODUCT_LINK VARCHAR2(2000),
+        STATUS VARCHAR2(40) DEFAULT ''ACTIVE'' NOT NULL ,
+        CREATED_AT DATE DEFAULT TRUNC(SYSDATE) NOT NULL
 
                           )';
        ELSE
@@ -26,35 +26,45 @@ END;
 
 CREATE OR REPLACE PROCEDURE p_add_inventory(
 
-    p_product_name IN VARCHAR2,
-    p_product_description IN VARCHAR2,
-    p_product_wholesale IN NUMBER,
-    p_product_retail IN NUMBER,
-    p_product_image IN VARCHAR2,
-    p_product_link IN VARCHAR2,
-    p_product_category IN VARCHAR2
+    P_PRODUCT_NAME IN VARCHAR2,
+    P_PRODUCT_DESCRIPTION IN VARCHAR2,
+    P_PRODUCT_WHOLESALE IN NUMBER,
+    P_PRODUCT_RETAIL IN NUMBER,
+    P_PRODUCT_IMAGE IN VARCHAR2,
+    P_PRODUCT_LINK IN VARCHAR2,
+    P_PRODUCT_CATEGORY IN VARCHAR2
 
 )
 AS BEGIN
 
     INSERT INTO INVENTORY(PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE, PRODUCT_RETAIL, PRODUCT_IMAGE,
                           PRODUCT_LINK, CATEGORY)
-    VALUES(p_product_name, p_product_description,
-           p_product_wholesale, p_product_retail, p_product_image,
-           p_product_link, p_product_category);
+    VALUES(P_PRODUCT_NAME, P_PRODUCT_DESCRIPTION,
+           P_PRODUCT_WHOLESALE, P_PRODUCT_RETAIL, P_PRODUCT_IMAGE,
+           P_PRODUCT_LINK, P_PRODUCT_CATEGORY);
 
     COMMIT ;
 end;
 
 CREATE OR REPLACE PROCEDURE p_display_inventory(
-
-    ref_cur OUT SYS_REFCURSOR
+    ref_cur OUT SYS_REFCURSOR,
+    p_mode IN VARCHAR2
 )
 AS BEGIN
-    OPEN ref_cur FOR
+        IF p_mode = 'ADMIN'
+        THEN  OPEN ref_cur FOR
         SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE,
         PRODUCT_RETAIL, PRODUCT_IMAGE, PRODUCT_LINK, CATEGORY, STATUS
         FROM INVENTORY;
+
+        ELSIF p_mode = 'CUSTOMER'
+        THEN  OPEN ref_cur FOR
+        SELECT PRODUCT_ID, PRODUCT_NAME, PRODUCT_DESCRIPTION, PRODUCT_WHOLESALE,
+        PRODUCT_RETAIL, PRODUCT_IMAGE, PRODUCT_LINK, CATEGORY, STATUS
+        FROM INVENTORY
+        WHERE STATUS = 'Active';
+
+        END IF;
 
 end;
 
@@ -104,3 +114,4 @@ END;
 
 select * from INVENTORY;
 
+truncate table INVENTORY ;
