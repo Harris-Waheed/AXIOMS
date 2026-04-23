@@ -7,6 +7,8 @@ class CartItems(BaseModel):
     product_id : int
     quantity : int
 
+
+
 class OrderIn(BaseModel):
 
     customer_name: str = Field(..., max_length=40)
@@ -26,12 +28,19 @@ class OrderCustomerOut(BaseModel):
     order_date : str
     order_id: int
 
-class OrderAdminOut(OrderCustomerOut):
+class OrderItemsAdmin(BaseModel):
 
     product_id : int
     product_name : str
     product_retail : int
+    product_image: str
+    qty: int
     product_link : HttpUrl | None = None
+
+class OrderAdminOut(OrderCustomerOut):
+
+    order_status: str
+    items : List[OrderItemsAdmin]
 
 
 class InventoryIn(BaseModel):
