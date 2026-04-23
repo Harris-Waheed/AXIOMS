@@ -1,3 +1,4 @@
+import json
 import oracledb
 from fastapi import APIRouter, Depends, HTTPException, status
 from models import OrderIn, OrderCustomerOut, OrderAdminOut, OrderStatus
@@ -100,30 +101,26 @@ def display_orders_admin(db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
-            data = cursor.var(oracledb.CURSOR)
+            cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_orders_admin', [data])
-            out_cursor = data.getvalue()
-            rows = out_cursor.fetchall()
-
-            out_cursor.close()
+            cursor.callproc('p_display_orders_admin')
+            data = cursor.getimplicitresults()
+            rows = data[0].fetchall() if data else []
 
             orders = []
 
             for row in rows:
                 result = {
 
-                    'customer_name': row[0],
-                    'customer_number': row[1],
-                    'customer_city': row[2],
-                    'customer_address': row[3],
-                    'customer_bill': row[4],
-                    'order_date': row[5],
-                    'order_id': row[6],
-                    'product_name' : row[7],
-                    'product_retail' : row[8],
-                    'product_link' : row[9],
-                    'product_id' : row[10]
+                    'order_id': row[0],
+                    'customer_name': row[1],
+                    'customer_number': row[2],
+                    'customer_city': row[3],
+                    'customer_address': row[4],
+                    'customer_bill': row[5],
+                    'order_date': row[6],
+                    'order_status' : row[7],
+                    'items' : json.loads(row[8])
                 }
 
                 orders.append(result)
