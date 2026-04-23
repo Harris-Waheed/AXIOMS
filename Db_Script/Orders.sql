@@ -15,7 +15,7 @@ BEGIN
         customer_city VARCHAR2(100) NOT NULL ,
         customer_address VARCHAR2(200) NOT NULL ,
         customer_bill NUMBER NOT NULL ,
-        status VARCHAR2(40) DEFAULT ''PENDING'' NOT NULL ,
+        order_status VARCHAR2(40) DEFAULT ''PENDING'' NOT NULL ,
         order_date DATE DEFAULT TRUNC(SYSDATE)
         )';
     ELSE
@@ -96,24 +96,56 @@ CREATE OR REPLACE PROCEDURE p_update_order_status(p_order_id IN NUMBER, new_stat
 AS
 BEGIN
     update ORDERS
-    set STATUS = new_status
+    set ORDER_STATUS = new_status
     WHERE ORDER_ID = p_order_id;
 
     COMMIT ;
 END;
 
-CREATE OR REPLACE PROCEDURE p_display_orders_admin(
-
-    ref_cur OUT SYS_REFCURSOR
-)
+CREATE OR REPLACE PROCEDURE p_display_orders_admin
 AS
-BEGIN
+    ref_cur SYS_REFCURSOR;
 
+BEGIN
    OPEN ref_cur FOR
-        SELECT CUSTOMER_NAME, CUSTOMER_NUMBER, CUSTOMER_CITY, CUSTOMER_ADDRESS, CUSTOMER_BILL,
-               TO_CHAR(ORDER_DATE, 'DD-MM_YYYY'), O.ORDER_ID, PRODUCT_NAME,
-                PRODUCT_RETAIL, PRODUCT_LINK, PRODUCT_ID
-            FROM ORDERS O INNER JOIN ORDER_ITEMS OI
-            ON O.ORDER_ID = OI.ORDER_ID INNER JOIN INVENTORY I USING(PRODUCT_ID);
+       SELECT O.ORDER_ID, O.CUSTOMER_NAME, O.CUSTOMER_NUMBER, O.CUSTOMER_CITY, O.CUSTOMER_ADDRESS, O.CUSTOMER_BILL,
+               TO_CHAR(ORDER_DATE, 'DD-MM-YYYY'), O.ORDER_STATUS,
+
+               JSON_ARRAYAGG(
+               JSON_OBJECT(
+                'product_id' VALUE I.product_id,
+                'product_name' VALUE I.product_name,
+                'product_retail' VALUE I.product_retail,
+                'product_link' VALUE I.product_link,
+                'product_image' VALUE I.PRODUCT_IMAGE,
+                'qty' VALUE oi.quantity)
+               )
+
+       FROM ORDERS O inner join ORDER_ITEMS OI ON O.ORDER_ID = OI.ORDER_ID
+        INNER JOIN INVENTORY I ON I.PRODUCT_ID = OI.PRODUCT_ID
+
+       GROUP BY O.ORDER_ID, O.CUSTOMER_NAME, O.CUSTOMER_NUMBER, O.CUSTOMER_CITY, O.CUSTOMER_ADDRESS, O.CUSTOMER_BILL,
+               TO_CHAR(ORDER_DATE, 'DD-MM-YYYY'), O.ORDER_STATUS;
+
+    DBMS_SQL.RETURN_RESULT(ref_cur);
 
 end;
+
+
+select PRODUCT_ID, PRODUCT_DESCRIPTION from  INVENTORY;
+
+update INVENTORY
+set PRODUCT_DESCRIPTION = 'Durable Quality With Dependable Build Elegant Motivational Quotes Design
+
+Comfortable Use With Compact
+
+Size 8x11
+
+Reliable Utility For Wall Decoration
+
+Includes Double Tape For Easy Mounting
+
+Suitable For Household Inspiration And Decoration Needs Thickness 2mm'
+where PRODUCT_ID = 8 and PRODUCT_ID = 6;
+
+commit ;
