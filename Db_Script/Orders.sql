@@ -133,19 +133,3 @@ end;
 
 
 select PRODUCT_ID, PRODUCT_DESCRIPTION from  INVENTORY;
-
-update INVENTORY
-set PRODUCT_DESCRIPTION = 'Durable Quality With Dependable Build Elegant Motivational Quotes Design
-
-Comfortable Use With Compact
-
-Size 8x11
-
-Reliable Utility For Wall Decoration
-
-Includes Double Tape For Easy Mounting
-
-Suitable For Household Inspiration And Decoration Needs Thickness 2mm'
-where PRODUCT_ID = 8 and PRODUCT_ID = 6;
-
-commit ;
