@@ -1,8 +1,9 @@
 import json
 import oracledb
+from uuid import uuid4
+from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from models import OrderIn, OrderCustomerOut, OrderAdminOut, OrderStatus
-from database import get_db
 
 
 router = APIRouter(prefix='/checkout', tags=['CHECKOUT'])
@@ -120,7 +121,9 @@ def display_orders_admin(db= Depends(get_db)):
                     'customer_bill': row[5],
                     'order_date': row[6],
                     'order_status' : row[7],
-                    'items' : json.loads(row[8])
+                    'review_token' : row[8],
+                    'review_status': row[9],
+                    'items' : json.loads(row[10])
                 }
 
                 orders.append(result)
@@ -193,8 +196,9 @@ def delete_order(order_id : int, db = Depends(get_db)):
        print('Database Error', e)
        raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
 
-@router.put('/{order_id}')
-def update_order_status(order_id : int, new_status : OrderStatus, db = Depends(get_db)):
+
+@router.patch('/{order_id}/status')
+def upd_sts_gen_tok(order_id : int, new_status : OrderStatus, db = Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -203,8 +207,15 @@ def update_order_status(order_id : int, new_status : OrderStatus, db = Depends(g
             actual_fb = feedback[0].fetchone() if feedback else None
 
             if actual_fb:
-
                 cursor.callproc('p_update_order_status', [order_id, new_status])
+
+                if new_status.value.upper() == 'DELIVERED':
+                    new_token = str(uuid4())
+
+                    cursor.callproc('p_add_review_token', [new_token, order_id])
+
+                    return {'status': new_status,
+                            'review_token': new_token}
                 return {'status': new_status}
 
             else:
@@ -213,3 +224,4 @@ def update_order_status(order_id : int, new_status : OrderStatus, db = Depends(g
     except oracledb.Error as e:
         print('Error For Updating Status', e)
         raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
+
