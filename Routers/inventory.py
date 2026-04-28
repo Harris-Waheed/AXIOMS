@@ -60,13 +60,10 @@ def display_customer_inventory(db= Depends(get_db)):
                     'product_id': row[0],
                     'product_name': row[1],
                     'product_description': row[2],
-                    'product_retail': row[4],
-                    'product_image': row[5],
-                    'product_category' : row[7]
+                    'product_retail': row[3],
+                    'product_image': row[4],
+                    'product_category' : row[5]
                 }
-
-                if row[8] and row[8] == 'Inactive':
-                    continue
 
                 orders.append(result)
 
