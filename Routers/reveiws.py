@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from database import get_db
-from models import ReviewsIn, ReviewsOut, ReviewsAdminOut
+from models import ReviewsIn, ReviewsCustomerOut, ReviewsAdminOut
 import oracledb
 from uuid import uuid4
 
@@ -42,7 +42,7 @@ def add_review(new_review : ReviewsIn, token : str, db= Depends(get_db)):
         raise HTTPException(status_code=500, detail='Failed to add review. Please try again later.')
 
 
-@router.get('/', response_model=list[ReviewsOut])
+@router.get('/', response_model=list[ReviewsCustomerOut])
 def display_reviews(limit: int= 6, offset: int= 0, db= Depends(get_db)):
 
     try:
