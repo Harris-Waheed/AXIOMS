@@ -2,89 +2,94 @@ from pydantic import BaseModel, Field, HttpUrl
 from typing import List
 from enum import Enum
 
+
 class CartItems(BaseModel):
-
-    product_id : int
-    quantity : int
-
+    product_id: int
+    quantity: int
 
 
 class OrderIn(BaseModel):
-
     customer_name: str = Field(..., max_length=40)
     customer_number: str = Field(..., max_length=13)
-    customer_city : str = Field(..., max_length=100)
+    customer_city: str = Field(..., max_length=100)
     customer_address: str = Field(..., max_length=200)
-    customer_bill : int = Field(..., gt=0)
-    cart_items : List[CartItems]
+    customer_bill: int = Field(..., gt=0)
+    cart_items: List[CartItems]
+
 
 class OrderCustomerOut(BaseModel):
-
     customer_name: str
     customer_number: str
-    customer_city : str
+    customer_city: str
     customer_address: str
     customer_bill: int
-    order_date : str
+    order_date: str
     order_id: int
 
-class OrderItemsAdmin(BaseModel):
 
-    product_id : int
-    product_name : str
-    product_retail : int
+class OrderItemsAdmin(BaseModel):
+    product_id: int
+    product_name: str
+    product_retail: int
     product_image: str
     qty: int
-    product_link : HttpUrl | None = None
+    product_link: HttpUrl | None = None
+
 
 class OrderAdminOut(OrderCustomerOut):
-
     order_status: str
-    items : List[OrderItemsAdmin]
+    review_token: str | None = None
+    review_status: str
+    items: List[OrderItemsAdmin]
 
 
 class InventoryIn(BaseModel):
+    product_name: str = Field(..., max_length=100)
+    product_description: str = Field(..., max_length=1000)
+    product_wholesale: int
+    product_retail: int
+    product_image: str
+    product_category: str
+    product_link: HttpUrl | None = None  # "HttpUrl OR None". Default is None.
 
-    product_name : str = Field(..., max_length=100)
-    product_description : str = Field(..., max_length=1000)
-    product_wholesale : int
-    product_retail : int
-    product_image : str
-    product_category : str
-    product_link : HttpUrl | None = None  # "HttpUrl OR None". Default is None.
 
 class InventoryCustomerOut(BaseModel):
-
-    product_id : int
-    product_name : str
+    product_id: int
+    product_name: str
     product_description: str
     product_retail: int
     product_image: str
-    product_category : str
+    product_category: str
+
 
 class InventoryAdminOut(InventoryCustomerOut):
-
-    product_wholesale : int
-    product_link : HttpUrl
-    product_status : str
+    product_wholesale: int
+    product_link: HttpUrl
+    product_status: str
 
 
 class ProductStatus(str, Enum):
-
     ACTIVE = 'Active'
     INACTIVE = 'Inactive'
 
-class OrderStatus(str, Enum):
 
+class OrderStatus(str, Enum):
     PENDING = 'Pending'
-    CANCEL = 'Cancel'
-    CONFIRM = 'Confirm'
+    CANCEL = 'Cancelled'
+    CONFIRM = 'Confirmed'
     SHIPPED = 'Shipped'
     DELIVERED = 'Delivered'
 
-class Reviews(BaseModel):
 
-    name : str
-    stars : int
-    description : str
+class ReviewsIn(BaseModel):
+    name: str
+    stars: int
+    description: str | None = None
 
+
+class ReviewsCustomerOut(ReviewsIn):
+    review_date: str
+
+class ReviewsAdminOut(ReviewsCustomerOut):
+    review_id : int
+    review_status : str
