@@ -3,7 +3,7 @@ import oracledb
 from uuid import uuid4
 from database import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
-from models import OrderIn, OrderCustomerOut, OrderAdminOut, OrderStatus
+from models import OrderIn, OrderCustomerOut, OrderAdminOut, OrderStatus, OrderUpdateIn
 
 
 router = APIRouter(prefix='/checkout', tags=['CHECKOUT'])
@@ -42,13 +42,12 @@ def add_order(new_order: OrderIn, db= Depends(get_db)):
                     db.rollback()
                     raise HTTPException(status_code=404, detail=f'Product Id {item.product_id} Not Exists!')
 
-            result = {
+            return {
                 'order_id' : actual_order_id,
                 'customer_name' : new_order.customer_name,
                 'customer_bill' : new_order.customer_bill,
                 'Item Quantity' : len(new_order.cart_items)
             }
-            return result
 
     except oracledb.Error as e:
         print(f'Database Error: {e}')
@@ -225,3 +224,38 @@ def upd_sts_gen_tok(order_id : int, new_status : OrderStatus, db = Depends(get_d
         print('Error For Updating Status', e)
         raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
 
+@router.put('/{order_id}')
+def update_order(order_id : int, updated_order : OrderUpdateIn, db=Depends(get_db)):
+
+    try:
+
+        with db.cursor() as cursor:
+            cursor.callproc('p_verify_order', [order_id])
+            feedback = cursor.getimplicitresults()
+            actual_fb = feedback[0].fetchone() if feedback else None
+
+            if actual_fb:
+
+                cursor.callproc('p_edit_order',
+                                [
+                                 order_id,
+                                 updated_order.customer_name,
+                                 updated_order.customer_number,
+                                 updated_order.customer_city,
+                                 updated_order.customer_address,
+                                 ])
+
+                return {
+
+                    'customer_name': updated_order.customer_name,
+                    'customer_number': updated_order.customer_number,
+                    'customer_city': updated_order.customer_city,
+                    'customer_address': updated_order.customer_address
+                }
+
+            else:
+                raise HTTPException(status_code=404, detail=f'Product {order_id} Not Exists!')
+
+    except oracledb.Error as e:
+        print('Error For Updating Product', e)
+        raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
