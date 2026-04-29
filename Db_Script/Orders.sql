@@ -136,3 +136,24 @@ BEGIN
 
 end;
 
+CREATE OR REPLACE PROCEDURE p_edit_order(
+    p_order_id IN NUMBER,
+    p_name IN VARCHAR2,
+    p_number IN VARCHAR2,
+    p_city IN VARCHAR2,
+    p_address IN VARCHAR2
+)
+AS
+BEGIN
+    UPDATE ORDERS
+    SET
+    CUSTOMER_NAME = p_name,
+    CUSTOMER_NUMBER = p_number,
+    CUSTOMER_CITY = p_city,
+    CUSTOMER_ADDRESS = p_address
+    WHERE ORDER_ID = p_order_id;
+
+    COMMIT;
+
+end;
+
