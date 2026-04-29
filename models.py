@@ -43,6 +43,13 @@ class OrderAdminOut(OrderCustomerOut):
     items: List[OrderItemsAdmin]
 
 
+class OrderUpdateIn(BaseModel):
+    customer_name: str = Field(..., max_length=40)
+    customer_number: str = Field(..., max_length=13)
+    customer_city: str = Field(..., max_length=100)
+    customer_address: str = Field(..., max_length=200)
+
+
 class InventoryIn(BaseModel):
     product_name: str = Field(..., max_length=100)
     product_description: str = Field(..., max_length=1000)
