@@ -24,6 +24,7 @@ BEGIN
    END IF;
 END;
 
+
 CREATE OR REPLACE PROCEDURE p_add_inventory(
 
     P_PRODUCT_ID OUT NUMBER,
@@ -49,6 +50,7 @@ AS BEGIN
     COMMIT ;
 end;
 
+
 CREATE OR REPLACE PROCEDURE p_display_inventory(
     ref_cur OUT SYS_REFCURSOR,
     p_mode IN VARCHAR2
@@ -70,8 +72,8 @@ AS BEGIN
         ORDER BY PRODUCT_ID DESC ;
 
         END IF;
-
 end;
+
 
 CREATE OR REPLACE PROCEDURE p_display_product(p_product_id IN NUMBER)
     AS
@@ -84,8 +86,8 @@ CREATE OR REPLACE PROCEDURE p_display_product(p_product_id IN NUMBER)
                 WHERE PRODUCT_ID = p_product_id;
 
     DBMS_SQL.RETURN_RESULT(p_product);
-
 end;
+
 
 CREATE OR REPLACE PROCEDURE p_verify_product(p_product_id IN NUMBER)
 AS
@@ -97,6 +99,7 @@ BEGIN
 
    DBMS_SQL.RETURN_RESULT(result_cur);
 end;
+
 
 CREATE OR REPLACE PROCEDURE p_edit_product(
     P_PRODUCT_ID IN NUMBER,
@@ -126,6 +129,7 @@ BEGIN
 
 end;
 
+
 CREATE OR REPLACE PROCEDURE p_delete_product(p_product_id IN NUMBER)
 AS
     BEGIN
@@ -134,6 +138,7 @@ AS
 
         COMMIT ;
     end;
+
 
 CREATE OR REPLACE PROCEDURE p_update_product_status(p_product_id IN NUMBER, new_status IN VARCHAR2)
 AS
@@ -145,4 +150,4 @@ BEGIN
     COMMIT ;
 END;
 
-select * from INVENTORY;
+
