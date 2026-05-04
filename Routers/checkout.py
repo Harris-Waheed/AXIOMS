@@ -58,17 +58,14 @@ def add_order(new_order: OrderIn, db= Depends(get_db)):
 
 
 @router.get('/', response_model=list[OrderCustomerOut])
-def display_orders(db= Depends(get_db)):
+def display_orders(offset:int = 0, limit:int = 10, db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
-            data = cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_orders', [data])
-            out_cursor = data.getvalue()
-            rows = out_cursor.fetchall()
-
-            out_cursor.close()
+            cursor.callproc('p_display_orders', ['CUSTOMER'.upper(), offset, limit])
+            data = cursor.getimplicitresults()
+            rows = data[0].fetchall() if data else []
 
             orders = []
 
@@ -97,13 +94,12 @@ def display_orders(db= Depends(get_db)):
 
 
 @router.get('/admin', response_model=list[OrderAdminOut])
-def display_orders_admin(db= Depends(get_db)):
+def display_orders_admin(offset:int = 0, limit:int = 10, db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
-            cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_orders_admin')
+            cursor.callproc('p_display_orders', ['ADMIN'.upper(), offset, limit])
             data = cursor.getimplicitresults()
             rows = data[0].fetchall() if data else []
 
