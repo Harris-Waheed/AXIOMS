@@ -1,5 +1,4 @@
 import oracledb
-
 import security
 from database import get_db
 from jose import jwt, JWTError
