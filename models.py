@@ -3,6 +3,15 @@ from typing import List
 from enum import Enum
 
 
+class Authentication(BaseModel):
+    username : str
+    password : str
+
+
+class ChangeCredentials(BaseModel):
+    old_password : str
+    new_password : str
+
 class CartItems(BaseModel):
     product_id: int
     quantity: int
