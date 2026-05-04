@@ -42,13 +42,13 @@ def add_inventory(new_product: InventoryIn, db= Depends(get_db)):
 
 
 @router.get('/', response_model=list[InventoryCustomerOut])
-def display_customer_inventory(db= Depends(get_db)):
+def display_customer_inventory(offset:int = 0, limit:int = 10, db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
             data = cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_inventory', [data, 'CUSTOMER'.upper()])
+            cursor.callproc('p_display_inventory', [data, 'CUSTOMER'.upper(), offset, limit])
             out_cursor = data.getvalue()
             rows = out_cursor.fetchall()
 
@@ -80,13 +80,13 @@ def display_customer_inventory(db= Depends(get_db)):
 
 
 @router.get('/admin', response_model=list[InventoryAdminOut])
-def display_admin_inventory(db= Depends(get_db)):
+def display_admin_inventory(offset:int = 0, limit:int = 10, db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
             data = cursor.var(oracledb.CURSOR)
 
-            cursor.callproc('p_display_inventory', [data, 'ADMIN'.upper()])
+            cursor.callproc('p_display_inventory', [data, 'ADMIN'.upper(), offset, limit])
             out_cursor = data.getvalue()
             rows = out_cursor.fetchall()
 
