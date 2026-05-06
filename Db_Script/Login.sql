@@ -58,4 +58,6 @@ AS
 
 end;
 
+COMMIT ;
+
 select * from AUTHENTICATION
