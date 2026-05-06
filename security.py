@@ -7,8 +7,8 @@ from datetime import datetime, timedelta, timezone
 env_file = load_dotenv()
 
 pwd_context = CryptContext(schemes=['bcrypt'])
-SECRET_KEY = os.environ.get('MY_SECRET_KEY')
-ALGORITHM = 'HS256'
+SECRET_KEY = os.getenv('MY_SECRET_KEY')
+ALGORITHM = os.getenv('ALGORITHM')
 TOKEN_TIME = 30
 
 
