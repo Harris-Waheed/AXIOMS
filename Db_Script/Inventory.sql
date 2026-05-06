@@ -54,8 +54,8 @@ end;
 CREATE OR REPLACE PROCEDURE p_display_inventory(
     ref_cur OUT SYS_REFCURSOR,
     p_mode IN VARCHAR2,
-    p_skip IN NUMBER,
-    p_limit IN NUMBER
+    p_skip IN NUMBER DEFAULT NULL,
+    p_limit IN NUMBER DEFAULT NULL
 )
 AS BEGIN
         IF p_mode = 'ADMIN'
@@ -72,8 +72,7 @@ AS BEGIN
         PRODUCT_RETAIL, PRODUCT_IMAGE, PRODUCT_CATEGORY
         FROM INVENTORY
         WHERE STATUS = 'Active'
-        ORDER BY PRODUCT_ID DESC
-        OFFSET p_skip ROWS FETCH NEXT p_limit ROWS ONLY;
+        ORDER BY PRODUCT_ID DESC;
 
         END IF;
 end;
@@ -154,4 +153,15 @@ BEGIN
     COMMIT ;
 END;
 
+update INVENTORY
+set
+PRODUCT_DESCRIPTION = 'No of Frames: 5
+Size: 8×11 inch
+Material: Premium durable wooden finish
+Installation: Comes with strong double-sided tape
+Printing: High-quality digital printing for sharp and vibrant visuals'
+where
+PRODUCT_DESCRIPTION = '5';
 
+
+commit ;
