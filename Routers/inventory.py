@@ -1,14 +1,15 @@
 import oracledb
+from database import get_db
+from Routers.login import get_token
 from fastapi import APIRouter, Depends, HTTPException, status
 from models import InventoryIn, InventoryCustomerOut, InventoryAdminOut, ProductStatus
-from database import get_db
 
 
 router = APIRouter(prefix='/inventory', tags=['INVENTORY'])
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED)
-def add_inventory(new_product: InventoryIn, db= Depends(get_db)):
+def add_inventory(new_product: InventoryIn, token : str = Depends(get_token), db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -80,7 +81,7 @@ def display_customer_inventory(db= Depends(get_db)):
 
 
 @router.get('/admin', response_model=list[InventoryAdminOut])
-def display_admin_inventory(offset:int = 0, limit:int = 10, db= Depends(get_db)):
+def display_admin_inventory(offset:int = 0, limit:int = 10, token : str = Depends(get_token), db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -157,7 +158,7 @@ def display_product(item_id: int, db=Depends(get_db)):
 
 
 @router.delete('/{product_id}')
-def delete_product(product_id : int, db = Depends(get_db)):
+def delete_product(product_id : int, token : str = Depends(get_token), db = Depends(get_db)):
 
    try:
         with db.cursor() as cursor:
@@ -183,7 +184,8 @@ def delete_product(product_id : int, db = Depends(get_db)):
 
 
 @router.patch('/{product_id}/status')
-def update_product_status(product_id : int, new_status : ProductStatus, db = Depends(get_db)):
+def update_product_status(product_id : int, new_status : ProductStatus, token : str = Depends(get_token),
+                                                                                                db = Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -205,7 +207,7 @@ def update_product_status(product_id : int, new_status : ProductStatus, db = Dep
 
 
 @router.put('/{product_id}')
-def update_product(product_id : int, updated_product : InventoryIn, db=Depends(get_db)):
+def edit_product(product_id : int, updated_product : InventoryIn, token : str = Depends(get_token), db=Depends(get_db)):
 
     try:
         product_link = str(updated_product.product_link) if updated_product.product_link else None

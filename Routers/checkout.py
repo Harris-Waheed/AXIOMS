@@ -2,6 +2,7 @@ import json
 import oracledb
 from uuid import uuid4
 from database import get_db
+from Routers.login import get_token
 from fastapi import APIRouter, Depends, HTTPException, status
 from models import OrderIn, OrderCustomerOut, OrderAdminOut, OrderStatus, OrderUpdateIn
 
@@ -94,7 +95,7 @@ def display_orders(offset:int = 0, limit:int = 10, db= Depends(get_db)):
 
 
 @router.get('/admin', response_model=list[OrderAdminOut])
-def display_orders_admin(offset:int = 0, limit:int = 10, db= Depends(get_db)):
+def display_orders_admin(offset:int = 0, limit:int = 10, token : str = Depends(get_token), db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -167,7 +168,7 @@ def display_order(order_id: int, db = Depends(get_db)):
 
 
 @router.delete('/{order_id}')
-def delete_order(order_id : int, db = Depends(get_db)):
+def delete_order(order_id : int, token : str = Depends(get_token), db = Depends(get_db)):
 
    try:
         with db.cursor() as cursor:
@@ -193,7 +194,7 @@ def delete_order(order_id : int, db = Depends(get_db)):
 
 
 @router.patch('/{order_id}/status')
-def upd_sts_gen_tok(order_id : int, new_status : OrderStatus, db = Depends(get_db)):
+def upd_sts_gen_tok(order_id : int, new_status : OrderStatus, token : str = Depends(get_token), db = Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -221,7 +222,7 @@ def upd_sts_gen_tok(order_id : int, new_status : OrderStatus, db = Depends(get_d
         raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
 
 @router.put('/{order_id}')
-def update_order(order_id : int, updated_order : OrderUpdateIn, db=Depends(get_db)):
+def edit_order(order_id : int, updated_order : OrderUpdateIn, token : str = Depends(get_token), db=Depends(get_db)):
 
     try:
 

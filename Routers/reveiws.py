@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from database import get_db
+from Routers.login import get_token
 from models import ReviewsIn, ReviewsCustomerOut, ReviewsAdminOut
 import oracledb
 from uuid import uuid4
@@ -71,7 +72,7 @@ def display_reviews(limit: int= 6, offset: int= 0, db= Depends(get_db)):
 
 
 @router.get('/admin', response_model=list[ReviewsAdminOut])
-def display_reviews_admin(limit: int, offset: int, db= Depends(get_db)):
+def display_reviews_admin(limit: int, offset: int, token : str = Depends(get_token), db= Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -127,7 +128,7 @@ def generate_token(order_id : int, db= Depends(get_db)):
         raise HTTPException(status_code=500, detail='Failed to add review token. Please try again later.')
 
 @router.patch('/{review_id}/status')
-def update_review_visibility(review_id : int, new_status : str, db = Depends(get_db)):
+def update_review_visibility(review_id : int, new_status : str, token : str = Depends(get_token), db = Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
@@ -139,8 +140,9 @@ def update_review_visibility(review_id : int, new_status : str, db = Depends(get
         print('Error For Updating Review Status', e)
         raise HTTPException(status_code=500, detail='Error Occurred On Our Side!')
 
+
 @router.delete('/{review_id}')
-def delete_review(review_id: int, db=Depends(get_db)):
+def delete_review(review_id: int, token : str = Depends(get_token), db=Depends(get_db)):
 
     try:
         with db.cursor() as cursor:
