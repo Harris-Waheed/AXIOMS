@@ -1,5 +1,5 @@
 import os
-from jose import jwt, JWTError
+from jose import jwt
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
