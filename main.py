@@ -4,8 +4,16 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://axioms-pk.me",
+    "https://www.axioms-pk.me"
+]
+
 app.add_middleware(CORSMiddleware,
-                   allow_origins=['*'],
+                   allow_origins=origins,
                    allow_headers=['*'],
                    allow_credentials=False,
                    allow_methods=['*'],
