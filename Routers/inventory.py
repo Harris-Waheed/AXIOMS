@@ -55,7 +55,7 @@ def display_customer_inventory(db= Depends(get_db)):
 
             out_cursor.close()
 
-            orders = []
+            inventory_list = []
 
             for row in rows:
 
@@ -69,9 +69,9 @@ def display_customer_inventory(db= Depends(get_db)):
                     'product_category' : row[5]
                 }
 
-                orders.append(result)
+                inventory_list.append(result)
 
-        return orders
+        return inventory_list
 
     except oracledb.Error as e:
         print(f'Error for fetching checkout data {e}')
@@ -93,7 +93,7 @@ def display_admin_inventory(offset:int = 0, limit:int = 10, token : str = Depend
 
             out_cursor.close()
 
-            orders = []
+            inventory_list = []
 
             for row in rows:
 
@@ -110,9 +110,9 @@ def display_admin_inventory(offset:int = 0, limit:int = 10, token : str = Depend
                     'product_status': row[8]
                 }
 
-                orders.append(result)
+                inventory_list.append(result)
 
-        return orders
+        return inventory_list
 
     except oracledb.Error as e:
         print(f'Error for fetching checkout data {e}')
