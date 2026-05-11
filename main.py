@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from Routers import checkout, inventory, reveiws, login
+from Routers import checkout, inventory, reviews, login
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -22,7 +22,7 @@ app.add_middleware(CORSMiddleware,
 app.include_router(login.router)
 app.include_router(checkout.router)
 app.include_router(inventory.router)
-app.include_router(reveiws.router)
+app.include_router(reviews.router)
 
 
 if __name__ == '__main__':
